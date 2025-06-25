@@ -1,13 +1,8 @@
-def build_prompt(txt_path: str, user_query: str) -> str:
-    try:
-        with open(txt_path, "r", encoding="utf-8") as f:
-            context = f.read().strip()
-    except FileNotFoundError:
-        raise FileNotFoundError(f"File not found: {txt_path}")
-    except Exception as e:
-        raise Exception(f" Error reading file: {e}")
+"""
+Raw prompt templates used for building requests to the LLM.
+"""
 
-    prompt = f"""
+PRESENTATION_TEMPLATE = """
 You are a helpful and intelligent assistant experienced in creating full PowerPoint-style presentations.
 
 Your task is to generate a complete presentation (around 10-12 slides) based on the content and user instructions below.
@@ -25,7 +20,6 @@ Your task is to generate a complete presentation (around 10-12 slides) based on 
 ---
 
 ### Output Format (Valid JSON):
-
 {{
   "title": "Presentation Title",
   "slides": [
@@ -43,19 +37,4 @@ Your task is to generate a complete presentation (around 10-12 slides) based on 
 }}
 
 ---
-
-### User Query:
-{user_query}
-
----
-
-### Source Text:
-{context}
-
----
-
-Make sure the output is valid JSON, well-structured, and follows the requested slide structure.
 """
-
-    return prompt
-

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from src.llm import generate_slide_content
-from src.prompts.templates import build_prompt
+from src.prompts.prompt_manager import PromptManager
 
 app = FastAPI()
 
@@ -40,8 +40,18 @@ def generate_slide(req: SlideRequest) -> SlideResponse:
         SlideResponse: Structured result with the generated content.
     """
     try:
-        prompt = build_prompt(req.text_path, req.user_query)
+        # Read the content of the text file
+        with open(req.text_path, "r", encoding="utf-8") as f:
+            context = f.read().strip()
+        
+        # Build prompt using the PromptManager class
+        prompt = PromptManager.build_presentation_prompt(context, req.user_query)
+
+        # Call LLM to generate content
         response = generate_slide_content(prompt)
+
+        # Return as structured response
         return SlideResponse(result=response)
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

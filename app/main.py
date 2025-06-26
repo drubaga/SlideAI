@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from src.llm import LLMClient, LLMRequest
+from src.llm import LLMClient
 from src.prompts.prompt_manager import PromptManager
 
 app = FastAPI()
@@ -28,9 +28,8 @@ def generate_slide(req: SlideRequest) -> SlideResponse:
         user_prompt = req.user_query
 
         # Prepare and send LLM request
-        llm_request = LLMRequest(system_prompt=system_prompt, user_prompt=user_prompt)
         llm = LLMClient()
-        response = llm.get_content(llm_request)
+        response = llm.get_content(system_prompt=system_prompt, user_prompt=user_prompt)
 
         return SlideResponse(result=response)
 

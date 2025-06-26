@@ -19,17 +19,17 @@ def health() -> dict:
 @app.post("/generate-slide-content", response_model=SlideResponse)
 def generate_slide(req: SlideRequest) -> SlideResponse:
     try:
-        # Load context from text file
+        # Load file content
         with open(req.text_path, "r", encoding="utf-8") as f:
             context = f.read().strip()
 
-        # Split prompt into system + user parts
+        # Get prompts
         system_prompt = PromptManager.get_system_prompt(context)
         user_prompt = req.user_query
 
-        # Prepare and send LLM request
+        # Use updated LLMClient
         llm = LLMClient()
-        response = llm.get_content(system_prompt=system_prompt, user_prompt=user_prompt)
+        response = llm.get_content(system_prompt, user_prompt)
 
         return SlideResponse(result=response)
 

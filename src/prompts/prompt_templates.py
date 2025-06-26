@@ -30,7 +30,6 @@ Your task is to generate a complete presentation (around 10-12 slides) based on 
         "Bullet point 2"
       ],
       "key_message": "Optional summary of this slide",
-      "img_keywords": "keywords for visuals"
     }},
     ...
   ]

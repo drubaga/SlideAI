@@ -1,34 +1,20 @@
-"""
-PromptManager class for building prompts using raw templates and user input.
-"""
-
+# 📁 src/prompts/prompt_manager.py
 from src.prompts.prompt_templates import PRESENTATION_TEMPLATE
 
 class PromptManager:
-
     @staticmethod
-    def build_presentation_prompt(context: str, user_query: str) -> str:
+    def get_system_prompt(context: str) -> str:
         """
-        Formats the presentation template with user query and source context.
-
-        Args:
-            context (str): The content of the uploaded file.
-            user_query (str): The user instruction for the assistant.
-
-        Returns:
-            str: A formatted prompt ready for LLM input.
+        Returns the instruction-style system prompt (without user input).
         """
         return f"""{PRESENTATION_TEMPLATE}
 
-### User Query:
-{user_query}
-
----
+--- 
 
 ### Source Text:
 {context}
 
----
+--- 
 
 Make sure the output is valid JSON, well-structured, and follows the requested slide structure.
 """

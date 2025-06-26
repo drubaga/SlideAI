@@ -5,12 +5,10 @@ from src.prompts.prompt_manager import PromptManager
 
 app = FastAPI()
 
-# Request model for the API
 class SlideRequest(BaseModel):
     user_query: str
     text_path: str
 
-# Response model
 class SlideResponse(BaseModel):
     result: str
 
@@ -21,20 +19,16 @@ def health() -> dict:
 @app.post("/generate-slide-content", response_model=SlideResponse)
 def generate_slide(req: SlideRequest) -> SlideResponse:
     try:
-        # Read the file content
+        # Load context from text file
         with open(req.text_path, "r", encoding="utf-8") as f:
             context = f.read().strip()
 
-        # Build prompt using PromptManager
-        prompt = PromptManager.build_presentation_prompt(context, req.user_query)
+        # Split prompt into system + user parts
+        system_prompt = PromptManager.get_system_prompt(context)
+        user_prompt = req.user_query
 
-        # Create the request object for the LLM
-        llm_request = LLMRequest(
-            system_prompt="You are a helpful assistant generating presentation slides.",
-            user_prompt=prompt
-        )
-
-        # Use the LLMClient to get the response content
+        # Prepare and send LLM request
+        llm_request = LLMRequest(system_prompt=system_prompt, user_prompt=user_prompt)
         llm = LLMClient()
         response = llm.get_content(llm_request)
 

@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from src.llm import LLMClient
 from src.prompts.prompt_manager import PromptManager
+from src.config import openai_model, openai_temperature, openai_max_tokens
 
 app = FastAPI()
 
@@ -29,8 +30,7 @@ def generate_slide(req: SlideRequest) -> SlideResponse:
 
         # Use updated LLMClient
         llm = LLMClient()
-        response = llm.get_content(system_prompt, user_prompt)
-
+        response = llm.get_content( system_prompt, user_prompt, model=openai_model, temperature=openai_temperature, max_tokens=openai_max_tokens)
         return SlideResponse(result=response)
 
     except Exception as e:

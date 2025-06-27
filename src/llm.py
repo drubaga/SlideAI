@@ -36,16 +36,17 @@ class LLMClient:
             **kwargs
         )
 
-    def get_content(self, system_prompt: str, user_prompt: str) -> str:
+    def get_content(self, system_prompt: str, user_prompt: str, **kwargs) -> str:
         """
         Extracts just the content (string) from the LLM response.
 
         Args:
-            system_prompt (str): The system-level instructions for the LLM.
-            user_prompt (str): The user's query or request.
+            system_prompt (str): Instructions.
+            user_prompt (str): Actual user question.
+            **kwargs: Additional parameters for OpenAI (e.g. model, temperature).
 
         Returns:
-            str: The LLM's textual response content.
+            str: The LLM response content.
         """
         try:
             messages = [
@@ -53,12 +54,7 @@ class LLMClient:
                 {"role": "user", "content": user_prompt}
             ]
 
-            response = self.generate_response(
-                messages=messages,
-                temperature=openai_temperature,
-                max_tokens=openai_max_tokens
-            )
+            response = self.generate_response(messages=messages, **kwargs)
             return response.choices[0].message.content.strip()
-
         except Exception as e:
             raise RuntimeError(f"OpenAI call failed: {e}")

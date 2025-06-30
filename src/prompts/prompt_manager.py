@@ -1,6 +1,6 @@
-# 📁 src/prompts/prompt_manager.py
 from src.prompts.prompt_templates import PRESENTATION_TEMPLATE
 
+# context bellow is the data folder 
 class PromptManager:
     @staticmethod
     def get_system_prompt(context: str) -> str:
@@ -9,6 +9,7 @@ class PromptManager:
         """
         return f"""{PRESENTATION_TEMPLATE}
 
+
 --- 
 
 ### Source Text:
@@ -16,5 +17,6 @@ class PromptManager:
 
 --- 
 
-Make sure the output is valid JSON, well-structured, and follows the requested slide structure.
+Return only the JSON object. Do not use markdown formatting or escape characters. Do not wrap it in triple backticks. Use single braces only.
+
 """

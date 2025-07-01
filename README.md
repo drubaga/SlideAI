@@ -66,3 +66,34 @@ pip install -r requirements.txt
 - **uvicorn** – ASGI server  
 - **python-pptx** – *(Optional)* for future slide generation  
 
+## Environment Setup
+
+### 1. Create a Virtual Environment (Recommended)
+
+```bash
+python -m venv venv
+```
+### 2. Activate the Virtual Environment
+
+**On macOS/Linux:**
+
+```bash
+source venv/bin/activate
+```
+
+**On Windows:**
+
+```bash
+venv\Scripts\activate
+```
+
+### 3. Running the Application
+Run the FastAPI app with Uvicorn:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Then open your browser to:
+- http://127.0.0.1:8000/health – Health check
+- http://127.0.0.1:8000/docs – Interactive Swagger docs

@@ -29,11 +29,18 @@ Your task is to generate a complete presentation (around 10-12 slides) based on 
         "Bullet point 1",
         "Bullet point 2"
       ],
-      "key_message": "Optional summary of this slide",
+      "key_message": "Optional summary of this slide"
     }},
     ...
   ]
 }}
 
 ---
+
+### Source Text:
+{context}
+
+---
+
+Return only the JSON object. Do not use markdown formatting or escape characters. Do not wrap it in triple backticks. Use single braces only.
 """

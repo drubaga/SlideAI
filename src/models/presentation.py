@@ -4,7 +4,7 @@ from typing import List, Optional
 class Slide(BaseModel):
     heading: str
     bullet_points: List[str]
-    key_message: Optional[str] = None  # optional field
+    key_message: Optional[str] = None 
 
 class Presentation(BaseModel):
     title: str

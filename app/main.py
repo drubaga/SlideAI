@@ -9,17 +9,36 @@ app = FastAPI()
 
 
 class SlideRequest(BaseModel):
+    """Request model containing the user query and path to the input text file."""
     user_query: str
     text_path: str
 
 
 @app.get("/health")
 def health() -> dict:
+    """
+    Health check endpoint.
+
+    Returns:
+        dict: A simple status message indicating the app is running.
+    """
     return {"status": "ok"}
 
 
 @app.post("/generate-slide-content", response_model=Presentation)
 def generate_slide(req: SlideRequest) -> Presentation:
+    """
+    Generates a structured slide presentation from a user query and source text.
+
+    Args:
+        req (SlideRequest): Contains user prompt and path to the .txt file.
+
+    Returns:
+        Presentation: A structured presentation object based on the prompts.
+
+    Raises:
+        HTTPException: If file reading or LLM generation fails.
+    """
     try:
         # Load file content from path
         with open(req.text_path, "r", encoding="utf-8") as f:

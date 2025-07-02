@@ -11,6 +11,9 @@ Your task is to generate a complete presentation (around 10-12 slides) based on 
 
 ### Requirements:
 - Begin with an **intro slide** that includes the date and topic title
+  - The intro slide should feel **warm and inviting**
+  - Use a **light hook, friendly tone, or a playful observation** to introduce the topic
+  - If appropriate, include a **short anecdote, light joke, or surprising fact** to engage the audience
 - Create **content slides** with slide titles and clear, descriptive bullet points
 - Include **short examples or case illustrations** on 2-3 slides (when relevant)
 - Include **one step-by-step process slide**, using '>>' to indicate each step

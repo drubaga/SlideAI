@@ -1,6 +1,7 @@
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.shapes import PP_PLACEHOLDER
+from pptx.dml.color import RGBColor
 import os
 from src.models.presentation import Presentation as PresentationModel
 
@@ -23,6 +24,18 @@ def generate_pptx_from_json(
     """
     prs = Presentation(template_path)
 
+    # --- Title Slide ---
+    title_slide_layout = prs.slide_layouts[0]  # usually title + subtitle
+    title_slide = prs.slides.add_slide(title_slide_layout)
+
+    title_shape = title_slide.shapes.title
+    subtitle_shape = title_slide.placeholders[1] if len(title_slide.placeholders) > 1 else None
+
+    title_shape.text = presentation.title
+    if subtitle_shape:
+        subtitle_shape.text = "An AI-generated presentation"
+
+    # --- Content Slides ---
     for slide_data in presentation.slides:
         slide_layout = prs.slide_layouts[1]  # Title and Content layout
         slide = prs.slides.add_slide(slide_layout)
@@ -44,7 +57,7 @@ def generate_pptx_from_json(
         bullet_points = slide_data.bullet_points or []
         key_message = slide_data.key_message
 
-        # Clear any existing content
+        # Clear and style content placeholder
         content_placeholder.text = ""
         text_frame = content_placeholder.text_frame
 
@@ -52,13 +65,25 @@ def generate_pptx_from_json(
             p = text_frame.add_paragraph() if i > 0 else text_frame.paragraphs[0]
             p.text = bullet
             p.level = 0
+            p.font.size = Pt(18)
 
         if key_message:
             text_frame.add_paragraph()  # line break
             p = text_frame.add_paragraph()
-            p.text = f"Key Message: {key_message}"
+            p.text = key_message
             p.level = 0
+            p.font.size = Pt(18)
+            p.font.bold = True
+            p.font.color.rgb = RGBColor(255, 105, 180) 
 
+    first_slide = prs.slides[0]
+    if not first_slide.shapes.title or first_slide.shapes.title.text.strip() == "":
+        xml_slides = prs.slides._sldIdLst
+        slides = list(xml_slides)
+        xml_slides.remove(slides[0])
+    
+    # --- Save ---
+    
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, f"{presentation.title.replace(' ', '_')}.pptx")
     prs.save(output_path)

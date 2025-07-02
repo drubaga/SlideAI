@@ -1,9 +1,12 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from src.llm import LLMClient
 from src.prompts.prompt_manager import PromptManager
 from src.config import openai_model, openai_temperature, openai_max_tokens
 from src.models.presentation import Presentation
+from src.pptx_generator.builder import generate_pptx_from_json
+import os
 
 app = FastAPI()
 
@@ -59,5 +62,30 @@ def generate_slide(req: SlideRequest) -> Presentation:
         )
         return presentation
 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/generate-pptx-from-template")
+def generate_pptx_with_template(presentation: Presentation):
+    """
+    Accepts structured JSON and generates a .pptx presentation using a predefined template.
+
+    Args:
+        presentation (Presentation): Structured presentation content.
+
+    Returns:
+        FileResponse: Downloadable .pptx file.
+
+    Raises:
+        HTTPException: If generation or saving fails.
+    """
+    try:
+        pptx_path = generate_pptx_from_json(presentation)
+        return FileResponse(
+            pptx_path,
+            media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            filename=os.path.basename(pptx_path)
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

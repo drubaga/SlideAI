@@ -25,7 +25,7 @@ def generate_pptx_from_json(
     prs = Presentation(template_path)
 
     # --- Title Slide ---
-    title_slide_layout = prs.slide_layouts[0]  # usually title + subtitle
+    title_slide_layout = prs.slide_layouts[0]  
     title_slide = prs.slides.add_slide(title_slide_layout)
 
     title_shape = title_slide.shapes.title
@@ -37,7 +37,7 @@ def generate_pptx_from_json(
 
     # --- Content Slides ---
     for slide_data in presentation.slides:
-        slide_layout = prs.slide_layouts[1]  # Title and Content layout
+        slide_layout = prs.slide_layouts[1] 
         slide = prs.slides.add_slide(slide_layout)
 
         title_placeholder = None
@@ -57,7 +57,6 @@ def generate_pptx_from_json(
         bullet_points = slide_data.bullet_points or []
         key_message = slide_data.key_message
 
-        # Clear and style content placeholder
         content_placeholder.text = ""
         text_frame = content_placeholder.text_frame
 
@@ -68,7 +67,7 @@ def generate_pptx_from_json(
             p.font.size = Pt(18)
 
         if key_message:
-            text_frame.add_paragraph()  # line break
+            text_frame.add_paragraph()  
             p = text_frame.add_paragraph()
             p.text = key_message
             p.level = 0

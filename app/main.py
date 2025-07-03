@@ -89,3 +89,46 @@ def generate_pptx_with_template(presentation: Presentation):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.post("/generate-pptx")
+def generate_pptx_from_prompt(req: SlideRequest):
+    """
+    Generates a .pptx file directly from a user prompt and source text.
+    
+    Args:
+        req (SlideRequest): Contains user prompt and path to the .txt file.
+
+    Returns:
+        FileResponse: Downloadable .pptx file.
+    """
+    try:
+        # Step 1: Read text context
+        with open(req.text_path, "r", encoding="utf-8") as f:
+            context = f.read().strip()
+
+        # Step 2: Build system prompt and call LLM
+        system_prompt = PromptManager.get_system_prompt(context)
+        user_prompt = req.user_query
+
+        llm = LLMClient()
+        presentation = llm.get_presentation(
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
+            model=openai_model,
+            temperature=openai_temperature,
+            max_tokens=openai_max_tokens
+        )
+
+        # Step 3: Generate PPTX from JSON
+        pptx_path = generate_pptx_from_json(presentation)
+
+        # Step 4: Return as downloadable file
+        return FileResponse(
+            pptx_path,
+            media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            filename=os.path.basename(pptx_path)
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

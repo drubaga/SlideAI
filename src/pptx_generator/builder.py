@@ -82,8 +82,11 @@ def generate_pptx_from_json(
         xml_slides.remove(slides[0])
     
     # --- Save ---
-    
-    os.makedirs(output_dir, exist_ok=True)
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+        print(f"[INFO] Created folder: {output_dir}")
+    else:
+        print(f"[INFO] Output folder already exists: {output_dir}")
     output_path = os.path.join(output_dir, f"{presentation.title.replace(' ', '_')}.pptx")
     prs.save(output_path)
     return output_path

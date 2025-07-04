@@ -97,3 +97,34 @@ uvicorn app.main:app --reload
 Then open your browser to:
 - http://127.0.0.1:8000/health – Health check
 - http://127.0.0.1:8000/docs – Interactive Swagger docs
+
+## Docker Usage
+
+You can run the SlideAI backend inside a Docker container for isolated, reproducible deployments.
+
+### 1. Build the Docker Image
+
+```bash
+docker build -t slideai-backend .
+```
+### 2. Run the Container
+
+Make sure you have a .env file in the project root with your OpenAI API key, and that your input .txt files are stored in the data/ directory.
+
+```bash
+docker run -d \
+  -p 8000:8000 \
+  --env-file .env \
+  -v $(pwd)/data:/app/data \
+  --name slideai-container \
+  slideai-backend
+```
+
+- `--env-file .env` loads your OpenAI credentials into the container.
+
+- `-v $(pwd)/data:/app/data` mounts your local `data/` folder into the container so your `.txt` input files can be accessed by the app.
+
+### 3. Access the App
+
+- **Health check:** [http://localhost:8000/health](http://localhost:8000/health)  
+- **Interactive docs:** [http://localhost:8000/docs](http://localhost:8000/docs)

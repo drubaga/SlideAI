@@ -1,92 +1,88 @@
 from pptx import Presentation
-from pptx.util import Inches, Pt
+from pptx.util import Pt
 from pptx.enum.shapes import PP_PLACEHOLDER
 from pptx.dml.color import RGBColor
 import os
 from src.models.presentation import Presentation as PresentationModel
 
 
-def generate_pptx_from_json(
-    presentation: PresentationModel,
-    template_path: str = "templates/base_template1.pptx",
-    output_dir: str = "output"
-) -> str:
-    """
-    Generates a PowerPoint file from a Presentation model using a given template.
+class PPTXBuilder:
+    def __init__(self, presentation: PresentationModel, template_path: str = "templates/base_template1.pptx", output_dir: str = "output"):
+        self.presentation_model = presentation
+        self.template_path = template_path
+        self.output_dir = output_dir
+        self.prs = Presentation(template_path)
 
-    Args:
-        presentation (PresentationModel): Pydantic model containing slides.
-        template_path (str): Path to the .pptx template.
-        output_dir (str): Directory where the generated .pptx will be saved.
+    def build(self) -> str:
+        self._add_title_slide()
+        self._add_content_slides()
+        self._remove_blank_first_slide()
+        return self._save_presentation()
 
-    Returns:
-        str: Path to the generated PowerPoint file.
-    """
-    prs = Presentation(template_path)
+    def _add_title_slide(self):
+        layout = self.prs.slide_layouts[0]
+        slide = self.prs.slides.add_slide(layout)
 
-    # --- Title Slide ---
-    title_slide_layout = prs.slide_layouts[0]  
-    title_slide = prs.slides.add_slide(title_slide_layout)
+        title = slide.shapes.title
+        subtitle = slide.placeholders[1] if len(slide.placeholders) > 1 else None
 
-    title_shape = title_slide.shapes.title
-    subtitle_shape = title_slide.placeholders[1] if len(title_slide.placeholders) > 1 else None
+        title.text = self.presentation_model.title
+        if subtitle:
+            subtitle.text = "An AI-generated presentation"
 
-    title_shape.text = presentation.title
-    if subtitle_shape:
-        subtitle_shape.text = "An AI-generated presentation"
+    def _add_content_slides(self):
+        layout = self.prs.slide_layouts[1]
 
-    # --- Content Slides ---
-    for slide_data in presentation.slides:
-        slide_layout = prs.slide_layouts[1] 
-        slide = prs.slides.add_slide(slide_layout)
+        for slide_data in self.presentation_model.slides:
+            slide = self.prs.slides.add_slide(layout)
+            title_ph, content_ph = self._find_placeholders(slide)
 
-        title_placeholder = None
-        content_placeholder = None
+            if not title_ph or not content_ph:
+                raise ValueError("Template is missing a title or content placeholder.")
+
+            title_ph.text = slide_data.heading
+            text_frame = content_ph.text_frame
+            text_frame.clear()
+
+            for i, bullet in enumerate(slide_data.bullet_points or []):
+                p = text_frame.add_paragraph() if i > 0 else text_frame.paragraphs[0]
+                p.text = bullet
+                p.level = 0
+                p.font.size = Pt(18)
+
+            if slide_data.key_message:
+                p = text_frame.add_paragraph()
+                p.text = slide_data.key_message
+                p.level = 0
+                p.font.size = Pt(18)
+                p.font.bold = True
+                p.font.color.rgb = RGBColor(255, 105, 180)
+
+    def _find_placeholders(self, slide):
+        title_ph = None
+        content_ph = None
 
         for shape in slide.placeholders:
             if shape.placeholder_format.type == PP_PLACEHOLDER.TITLE:
-                title_placeholder = shape
+                title_ph = shape
             elif shape.placeholder_format.type in (PP_PLACEHOLDER.BODY, PP_PLACEHOLDER.OBJECT):
-                content_placeholder = shape
+                content_ph = shape
 
-        if not title_placeholder or not content_placeholder:
-            raise ValueError("Template is missing a title or content placeholder.")
+        return title_ph, content_ph
 
-        title_placeholder.text = slide_data.heading
+    def _remove_blank_first_slide(self):
+        first = self.prs.slides[0]
+        if not first.shapes.title or first.shapes.title.text.strip() == "":
+            xml_slides = self.prs.slides._sldIdLst
+            xml_slides.remove(list(xml_slides)[0])
 
-        bullet_points = slide_data.bullet_points or []
-        key_message = slide_data.key_message
+    def _save_presentation(self) -> str:
+        if not os.path.isdir(self.output_dir):
+            os.makedirs(self.output_dir)
+            print(f"[INFO] Created folder: {self.output_dir}")
+        else:
+            print(f"[INFO] Output folder already exists: {self.output_dir}")
 
-        content_placeholder.text = ""
-        text_frame = content_placeholder.text_frame
-
-        for i, bullet in enumerate(bullet_points):
-            p = text_frame.add_paragraph() if i > 0 else text_frame.paragraphs[0]
-            p.text = bullet
-            p.level = 0
-            p.font.size = Pt(18)
-
-        if key_message:
-            text_frame.add_paragraph()  
-            p = text_frame.add_paragraph()
-            p.text = key_message
-            p.level = 0
-            p.font.size = Pt(18)
-            p.font.bold = True
-            p.font.color.rgb = RGBColor(255, 105, 180) 
-
-    first_slide = prs.slides[0]
-    if not first_slide.shapes.title or first_slide.shapes.title.text.strip() == "":
-        xml_slides = prs.slides._sldIdLst
-        slides = list(xml_slides)
-        xml_slides.remove(slides[0])
-    
-    # --- Save ---
-    if not os.path.isdir(output_dir):
-        os.makedirs(output_dir)
-        print(f"[INFO] Created folder: {output_dir}")
-    else:
-        print(f"[INFO] Output folder already exists: {output_dir}")
-    output_path = os.path.join(output_dir, f"{presentation.title.replace(' ', '_')}.pptx")
-    prs.save(output_path)
-    return output_path
+        output_path = os.path.join(self.output_dir, f"{self.presentation_model.title.replace(' ', '_')}.pptx")
+        self.prs.save(output_path)
+        return output_path

@@ -5,7 +5,7 @@ from src.llm import LLMClient
 from src.prompts.prompt_manager import PromptManager
 from src.config import openai_model, openai_temperature, openai_max_tokens
 from src.models.presentation import Presentation
-from src.pptx_generator.builder import generate_pptx_from_json
+from src.pptx_generator.builder import PPTXBuilder  # <-- OOP Builder class
 import os
 
 app = FastAPI()
@@ -43,15 +43,12 @@ def generate_slide(req: SlideRequest) -> Presentation:
         HTTPException: If file reading or LLM generation fails.
     """
     try:
-        # Load file content from path
         with open(req.text_path, "r", encoding="utf-8") as f:
             context = f.read().strip()
 
-        # Compose prompts
         system_prompt = PromptManager.get_system_prompt(context)
         user_prompt = req.user_query
 
-        # Generate structured output using Pydantic model
         llm = LLMClient()
         presentation = llm.get_presentation(
             system_prompt=system_prompt,
@@ -76,12 +73,9 @@ def generate_pptx_with_template(presentation: Presentation):
 
     Returns:
         FileResponse: Downloadable .pptx file.
-
-    Raises:
-        HTTPException: If generation or saving fails.
     """
     try:
-        pptx_path = generate_pptx_from_json(presentation)
+        pptx_path = PPTXBuilder(presentation).build()
         return FileResponse(
             pptx_path,
             media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -89,7 +83,7 @@ def generate_pptx_with_template(presentation: Presentation):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
+
 
 @app.post("/generate-pptx")
 def generate_pptx_from_prompt(req: SlideRequest):
@@ -103,11 +97,9 @@ def generate_pptx_from_prompt(req: SlideRequest):
         FileResponse: Downloadable .pptx file.
     """
     try:
-        # Step 1: Read text context
         with open(req.text_path, "r", encoding="utf-8") as f:
             context = f.read().strip()
 
-        # Step 2: Build system prompt and call LLM
         system_prompt = PromptManager.get_system_prompt(context)
         user_prompt = req.user_query
 
@@ -120,10 +112,8 @@ def generate_pptx_from_prompt(req: SlideRequest):
             max_tokens=openai_max_tokens
         )
 
-        # Step 3: Generate PPTX from JSON
-        pptx_path = generate_pptx_from_json(presentation)
+        pptx_path = PPTXBuilder(presentation).build()
 
-        # Step 4: Return as downloadable file
         return FileResponse(
             pptx_path,
             media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",

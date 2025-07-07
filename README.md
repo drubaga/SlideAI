@@ -1,13 +1,14 @@
 # SlideAI 
 
-SlideAI is a FastAPI-based backend service that generates AI-powered slide content from raw `.txt` files using OpenAI's large language models (LLMs). It transforms user queries and supporting source material into structured slide-ready content—ideal for automating presentation workflows.
+SlideAI is a full-stack AI-powered slide generator. It includes a FastAPI backend service that generates structured presentation content from .txt files using OpenAI’s LLMs, and a Streamlit-based frontend that allows users to interactively upload files, input queries, and download .pptx slides.
 
 ---
 
 ## Features:
 
 -  REST API built with FastAPI
--  LLM integration via OpenAI API (e.g., GPT-4o)
+- Streamlit web frontend for file upload and download
+-  LLM integration via OpenAI API (GPT-4o)
 -  Reads raw `.txt` files as input context
 -  Structured JSON output for slide content
 -  Retry logic for resilient API calls using `tenacity`
@@ -20,21 +21,24 @@ SlideAI is a FastAPI-based backend service that generates AI-powered slide conte
 ```text
 SlideAI/
 ├── app/
-│   └── main.py                 # FastAPI application entry point
+│   └── main.py                 # FastAPI backend entry point
+├── frontend/
+│   └── app.py                  # Streamlit frontend application
 ├── src/
-│   ├── llm.py                  # LLM client wrapper with retry and kwargs support
-│   ├── config.py               # Loads OpenAI config from environment
+│   ├── llm.py                  # LLM client wrapper
+│   ├── config.py               # Loads OpenAI config from env
 │   └── prompts/
-│       ├── prompt_manager.py   # Builds structured system prompts
-│       └── prompt_templates.py # Raw prompt templates
+│       ├── prompt_manager.py   # Prompt logic
+│       └── prompt_templates.py # Prompt templates
 ├── data/                       # Input .txt files
-├── tests/                      # (Optional) test suite
-├── .env                        # API key and config values
+├── output/                     # Generated .pptx files
+├── .env                        # OpenAI credentials
 ├── .gitignore
 ├── dockerfile
 ├── makefile
 ├── requirements.txt
 └── README.md
+
 ```
 
 
@@ -59,14 +63,15 @@ pip install -r requirements.txt
 **Key Packages:**
 
 - **fastapi** – REST API framework  
-- **openai** – OpenAI Python SDK  
+- **openai** – OpenAI Python SDK 
+- **streamlit** – Frontend UI 
 - **pydantic** – Data validation  
 - **tenacity** – Retry strategy  
 - **python-dotenv** – Load config from `.env`  
 - **uvicorn** – ASGI server  
 - **python-pptx** – *(Optional)* for future slide generation  
 
-## Environment Setup
+## Backend Setup
 
 ### 1. Create a Virtual Environment (Recommended)
 
@@ -97,6 +102,21 @@ uvicorn app.main:app --reload
 Then open your browser to:
 - http://127.0.0.1:8000/health – Health check
 - http://127.0.0.1:8000/docs – Interactive Swagger docs
+
+## Frontend (Streamlit)
+
+### 1. Navigate to frontend/ and run the app:
+
+```bash
+cd frontend
+streamlit run app.py
+```
+### 1. What it does:
+- Lets users upload .txt files
+- Prompts user for query
+- Calls the backend API
+- Allows downloading of the generated .pptx file
+
 
 ## Docker Usage
 

@@ -28,7 +28,7 @@ if st.button("Generate Slides") and uploaded_file is not None and user_query:
 
         # Let the user download the presentation directly
         st.download_button(
-            label="📥 Download PPTX",
+            label="Download PPTX",
             data=response.content,
             file_name="slides.pptx",
             mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"

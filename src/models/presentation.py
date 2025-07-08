@@ -6,6 +6,8 @@ class Slide(BaseModel):
     heading: str
     bullet_points: List[str]
     key_message: Optional[str] = None 
+    image_keywords: Optional[List[str]] = None  
+
 
 class Presentation(BaseModel):
     """A presentation consisting of a title and a list of slides."""

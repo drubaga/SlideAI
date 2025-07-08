@@ -1,16 +1,19 @@
 from pptx import Presentation
-from pptx.util import Pt
+from pptx.util import Pt, Inches
 from pptx.enum.shapes import PP_PLACEHOLDER
 from pptx.dml.color import RGBColor
 import os
+import requests
+from duckduckgo_search import ddg_images
+
 from src.models.presentation import Presentation as PresentationModel
 
-
 class PPTXBuilder:
-    def __init__(self, presentation: PresentationModel, template_path: str = "templates/base_template1.pptx", output_dir: str = "output"):
+    def __init__(self, presentation: PresentationModel, template_path: str = "templates/base_template1.pptx", output_dir: str = "output", image_dir: str = "images"):
         self.presentation_model = presentation
         self.template_path = template_path
         self.output_dir = output_dir
+        self.image_dir = image_dir
         self.prs = Presentation(template_path)
 
     def build(self) -> str:
@@ -57,6 +60,45 @@ class PPTXBuilder:
                 p.font.size = Pt(18)
                 p.font.bold = True
                 p.font.color.rgb = RGBColor(255, 105, 180)
+
+            # Insert image if keywords provided
+            if hasattr(slide_data, "image_keywords") and slide_data.image_keywords:
+                image_path = self._download_image(slide_data.image_keywords)
+                if image_path:
+                    slide.shapes.add_picture(image_path, Inches(5.5), Inches(1.5), width=Inches(4))
+
+    def _download_image(self, keywords: str) -> str:
+        if not os.path.exists(self.image_dir):
+            os.makedirs(self.image_dir)
+
+        try:
+            query = " ".join(keywords) if isinstance(keywords, list) else keywords
+            results = ddg_images(query, max_results=1)
+            
+            if not results or not isinstance(results, list):
+                print(f"[WARN] No valid image result for '{query}' — results: {results}")
+                return None
+
+            url = results[0].get("image")
+            if not url:
+                print(f"[WARN] No image URL found in result for '{query}'")
+                return None
+
+            filename_safe_query = query.replace(" ", "_").replace(",", "")
+            file_path = os.path.join(self.image_dir, f"{filename_safe_query}.jpg")
+
+            headers = {"User-Agent": "Mozilla/5.0"}
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+
+            with open(file_path, "wb") as f:
+                f.write(response.content)
+
+            return file_path
+
+        except Exception as e:
+            print(f"[ERROR] Failed to download image for '{keywords}': {e}")
+        return None
 
     def _find_placeholders(self, slide):
         title_ph = None

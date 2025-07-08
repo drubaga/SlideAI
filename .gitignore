@@ -1,5 +1,5 @@
 .env
-/data/
+data/
 __pycache__/
 *.py[oc]
 build/
@@ -9,3 +9,4 @@ wheels/
 .pytest_cache/
 .venv
 output/
+temp.txt

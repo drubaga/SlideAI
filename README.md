@@ -50,6 +50,7 @@ Make sure to create a `.env` file in the root directory with the following:
 
 ```env
 OPENAI_API_KEY=your-openai-api-key-here
+BACKEND_URL=your-backend-url
 ```
 
 ## Requirements

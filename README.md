@@ -51,6 +51,7 @@ Make sure to create a `.env` file in the root directory with the following:
 ```env
 OPENAI_API_KEY=your-openai-api-key-here
 BACKEND_URL=your-backend-url
+SERPAPI_API_KEY=your_real_key_here
 ```
 
 ## Requirements

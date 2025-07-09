@@ -4,7 +4,7 @@ from pptx.enum.shapes import PP_PLACEHOLDER
 from pptx.dml.color import RGBColor
 import os
 import requests
-from duckduckgo_search import ddg_images
+from serpapi import GoogleSearch
 
 from src.models.presentation import Presentation as PresentationModel
 
@@ -62,43 +62,54 @@ class PPTXBuilder:
                 p.font.color.rgb = RGBColor(255, 105, 180)
 
             # Insert image if keywords provided
-            if hasattr(slide_data, "image_keywords") and slide_data.image_keywords:
-                image_path = self._download_image(slide_data.image_keywords)
-                if image_path:
-                    slide.shapes.add_picture(image_path, Inches(5.5), Inches(1.5), width=Inches(4))
+          #  if hasattr(slide_data, "image_keywords") and slide_data.image_keywords:
+            #    image_path = self._download_image(slide_data.image_keywords)
+            #    if image_path:
+              #      slide.shapes.add_picture(image_path, Inches(5.5), Inches(1.5), width=Inches(4))
 
-    def _download_image(self, keywords: str) -> str:
-        if not os.path.exists(self.image_dir):
-            os.makedirs(self.image_dir)
+   # def _download_image(self, keywords: str) -> str:
+        #if not os.path.exists(self.image_dir):
+           # os.makedirs(self.image_dir)
 
-        try:
-            query = " ".join(keywords) if isinstance(keywords, list) else keywords
-            results = ddg_images(query, max_results=1)
-            
-            if not results or not isinstance(results, list):
-                print(f"[WARN] No valid image result for '{query}' — results: {results}")
-                return None
+       # try:
+          #  query = " ".join(keywords) if isinstance(keywords, list) else keywords
+           # print(f"[INFO] Searching SerpAPI for: {query}")
 
-            url = results[0].get("image")
-            if not url:
-                print(f"[WARN] No image URL found in result for '{query}'")
-                return None
+           # api_key = os.getenv("SERPAPI_API_KEY")
+           # if not api_key:
+              #  raise ValueError("SERPAPI_API_KEY not found in environment.")
 
-            filename_safe_query = query.replace(" ", "_").replace(",", "")
-            file_path = os.path.join(self.image_dir, f"{filename_safe_query}.jpg")
+           # search = GoogleSearch({
+              #  "q": query,
+              #  "tbm": "isch",               # image search mode
+               # "num": 1,
+               # "api_key": api_key
+           # })
 
-            headers = {"User-Agent": "Mozilla/5.0"}
-            response = requests.get(url, headers=headers, timeout=10)
-            response.raise_for_status()
+           # results = search.get_dict()
+           # images = results.get("images_results", [])
 
-            with open(file_path, "wb") as f:
-                f.write(response.content)
+            #if not images:
+              #  print(f"[WARN] No images found for '{query}'")
+               # return None
 
-            return file_path
+           # image_url = images[0]["original"]
+           # filename_safe_query = re.sub(r"[^\w\-_. ]", "_", query)
+            # file_path = os.path.join(self.image_dir, f"{filename_safe_query}.jpg")
 
-        except Exception as e:
-            print(f"[ERROR] Failed to download image for '{keywords}': {e}")
-        return None
+           # response = requests.get(image_url, timeout=10)
+          #  response.raise_for_status()
+
+           # with open(file_path, "wb") as f:
+              #  f.write(response.content)
+
+           # print(f"[INFO] Image saved for '{query}' → {file_path}")
+           # return file_path
+
+       # except Exception as e:
+          #  print(f"[ERROR] SerpAPI image fetch failed for '{keywords}': {e}")
+          #  return None
+
 
     def _find_placeholders(self, slide):
         title_ph = None

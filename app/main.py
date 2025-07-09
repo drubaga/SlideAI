@@ -8,6 +8,9 @@ from src.models.presentation import Presentation
 from src.pptx_generator.builder import PPTXBuilder
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 # Initialize FastAPI app instance
 app = FastAPI()
 

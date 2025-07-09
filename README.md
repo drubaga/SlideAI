@@ -52,6 +52,7 @@ Make sure to create a `.env` file in the root directory with the following:
 OPENAI_API_KEY=your-openai-api-key-here
 BACKEND_URL=your-backend-url
 SERPAPI_API_KEY=your_real_key_here
+PEXELS_API_KEY=your_pexels_api_key_here
 ```
 
 ## Requirements

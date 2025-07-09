@@ -6,6 +6,7 @@ from src.prompts.prompt_manager import PromptManager
 from src.config import openai_model, openai_temperature, openai_max_tokens
 from src.models.presentation import Presentation
 from src.pptx_generator.builder import PPTXBuilder
+from typing import Optional
 import os
 
 from dotenv import load_dotenv
@@ -19,6 +20,9 @@ app = FastAPI()
 class SlideRequest(BaseModel):
     user_query: str
     text_path: str
+    enable_images: bool = False
+    image_provider: Optional[str] = None
+
 
 
 @app.get("/health")
@@ -93,25 +97,13 @@ def generate_pptx_with_template(presentation: Presentation):
 
 @app.post("/generate-pptx")
 def generate_pptx_from_prompt(req: SlideRequest):
-    """
-    Generates a full PowerPoint (.pptx) file directly from a user prompt and .txt file.
-
-    Args:
-        req (SlideRequest): Contains user prompt and input file path.
-
-    Returns:
-        FileResponse: Downloadable .pptx presentation.
-    """
     try:
-        # Read the text content from the input file
         with open(req.text_path, "r", encoding="utf-8") as f:
             context = f.read().strip()
 
-        # Generate system and user prompts
         system_prompt = PromptManager.get_system_prompt(context)
         user_prompt = req.user_query
 
-        # Get structured presentation from LLM
         llm = LLMClient()
         presentation = llm.get_presentation(
             system_prompt=system_prompt,
@@ -121,14 +113,18 @@ def generate_pptx_from_prompt(req: SlideRequest):
             max_tokens=openai_max_tokens
         )
 
-        # Generate the PowerPoint file from the presentation data
-        pptx_path = PPTXBuilder(presentation).build()
+        # Inject user's image preferences directly into builder
+        pptx_path = PPTXBuilder(
+            presentation=presentation,
+            enable_images=req.enable_images,
+            image_provider=req.image_provider
+        ).build()
 
         return FileResponse(
             pptx_path,
             media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
             filename=os.path.basename(pptx_path)
         )
-
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+

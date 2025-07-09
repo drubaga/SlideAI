@@ -15,8 +15,8 @@ Your task is to generate a complete presentation (around 10-12 slides) based on 
 - Include **one step-by-step process slide**, using '>>' to indicate each step
 - Add a **key takeaway slide** before the final slides
 - End with a **conclusion** and a **thank you** slide
-- For **every slide**, provide a short list of 1–3 **image keywords** (nouns or concepts) that could represent the slide visually.
-  - These keywords will be used to search and insert images in a presentation.
+- For **every slide**, provide a list of 1  **image keywords** (noun or concept) that could represent the slide visually.
+  - this keyword will be used to search and insert images in a presentation.
 
 ---
 
@@ -31,7 +31,7 @@ Your task is to generate a complete presentation (around 10-12 slides) based on 
         "Bullet point 2"
       ],
       "key_message": "Optional summary of this slide",
-      "image_keywords": ["keyword1", "keyword2"]
+      "image_keywords": ["keyword1"]
     }},
     ...
   ]

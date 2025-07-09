@@ -13,3 +13,5 @@ class Presentation(BaseModel):
     """A presentation consisting of a title and a list of slides."""
     title: str
     slides: List[Slide]
+    enable_images: Optional[bool] = False
+    image_provider: Optional[str] = None  # "pexels" or "serpapi"

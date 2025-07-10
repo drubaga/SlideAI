@@ -14,7 +14,10 @@ st.title("SlideAI Frontend")
 user_query = st.text_input("Enter your prompt")
 uploaded_file = st.file_uploader("Upload a .txt file", type=["txt"])
 
-# New options for image settings
+# Template selection
+template = st.selectbox("Choose Slide Template", ["default", "company"])
+
+# Image settings
 enable_images = st.checkbox("Include Images", value=True)
 image_provider = None
 if enable_images:
@@ -30,7 +33,8 @@ if st.button("Generate Slides") and uploaded_file is not None and user_query:
         "user_query": user_query,
         "text_path": file_path,
         "enable_images": enable_images,
-        "image_provider": image_provider
+        "image_provider": image_provider,
+        "template": template
     }
 
     try:
@@ -47,4 +51,4 @@ if st.button("Generate Slides") and uploaded_file is not None and user_query:
         else:
             st.error(f" Error: {response.status_code} - {response.text}")
     except requests.exceptions.RequestException as e:
-        st.error(f"Failed to connect to backend: {e}")
+        st.error(f" Failed to connect to backend: {e}")

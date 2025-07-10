@@ -22,8 +22,7 @@ class SlideRequest(BaseModel):
     text_path: str
     enable_images: bool = False
     image_provider: Optional[str] = None
-
-
+    template: Optional[str] = "default"  
 
 @app.get("/health")
 def health() -> dict:
@@ -128,6 +127,7 @@ def generate_pptx_from_prompt(req: SlideRequest):
             temperature=openai_temperature,
             max_tokens=openai_max_tokens
         )
+        presentation.template = req.template  
 
         # Inject user's image preferences directly into builder
         pptx_path = PPTXBuilder(
@@ -135,6 +135,7 @@ def generate_pptx_from_prompt(req: SlideRequest):
             enable_images=req.enable_images,
             image_provider=req.image_provider
         ).build()
+
 
         return FileResponse(
             pptx_path,

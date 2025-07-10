@@ -13,6 +13,11 @@ SlideAI is a full-stack AI-powered slide generator. It includes a FastAPI backen
 -  Structured JSON output for slide content
 -  Retry logic for resilient API calls using `tenacity`
 -  Secure configuration with `.env`
+- Dynamic image generation with support for:
+  - No images
+  - Pexels API
+  - SerpAPI (Google Images)
+- Images automatically added to slides using keywords
 
 ---
 
@@ -27,18 +32,26 @@ SlideAI/
 ├── src/
 │   ├── llm.py                  # LLM client wrapper
 │   ├── config.py               # Loads OpenAI config from env
-│   └── prompts/
-│       ├── prompt_manager.py   # Prompt logic
-│       └── prompt_templates.py # Prompt templates
+│   ├── models/
+│   │   └── presentation.py   
+│   ├── prompts/
+│   │   ├── prompt_manager.py   # Prompt logic
+│   │   └── prompt_templates.py # Prompt templates
+│   ├── image_generators/
+│   │   ├── pexels_image_generator.py
+│   │   └── serpapi_image_generator.py
+│   └── pptx_generator/
+│       └── builder.py          # PPTX generation logic
 ├── data/                       # Input .txt files
 ├── output/                     # Generated .pptx files
-├── .env                        # OpenAI credentials
+├── images/                     # Downloaded image assets
+├── templates/                  # PowerPoint templates
+├── .env                        # API credentials
 ├── .gitignore
 ├── dockerfile
 ├── makefile
 ├── requirements.txt
 └── README.md
-
 ```
 
 
@@ -73,6 +86,8 @@ pip install -r requirements.txt
 - **python-dotenv** – Load config from `.env`  
 - **uvicorn** – ASGI server  
 - **python-pptx** – *(Optional)* for future slide generation  
+- **google-search-results** – SerpAPI Python SDK for Google Images integration
+
 
 ## Backend Setup
 

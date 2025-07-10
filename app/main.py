@@ -97,6 +97,22 @@ def generate_pptx_with_template(presentation: Presentation):
 
 @app.post("/generate-pptx")
 def generate_pptx_from_prompt(req: SlideRequest):
+    """
+    Generates a PowerPoint (.pptx) presentation from a user prompt and a context file.
+
+    Reads the context from the given text path, creates a prompt for the LLM,
+    generates slide content, and builds a presentation. Optionally includes images
+    based on user preferences.
+
+    Args:
+        req (SlideRequest): Includes the context file path, user prompt, image flag, and provider.
+
+    Returns:
+        FileResponse: The generated .pptx file.
+
+    Raises:
+        HTTPException: If an error occurs during generation or file creation.
+    """
     try:
         with open(req.text_path, "r", encoding="utf-8") as f:
             context = f.read().strip()

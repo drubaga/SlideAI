@@ -10,12 +10,32 @@ load_dotenv()
 SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
 
 class SerpApiImageGenerator:
+    """
+    A utility class that uses SerpAPI to fetch an image based on a keyword query
+    and saves it locally for use in slide generation.
+    """
+
     def __init__(self, image_dir="images"):
+        """
+        Initializes the image generator and ensures the output directory exists.
+
+        Args:
+            image_dir (str): Directory to save the downloaded images.
+        """
         self.image_dir = image_dir
         if not os.path.exists(self.image_dir):
             os.makedirs(self.image_dir)
 
     def fetch_image(self, keywords: str) -> str:
+        """
+        Searches SerpAPI for an image matching the given keywords and saves it locally.
+
+        Args:
+            keywords (str or list): A search query string or list of keyword strings.
+
+        Returns:
+            str: Path to the saved image file, or None if no image was found or an error occurred.
+        """
         try:
             query = " ".join(keywords) if isinstance(keywords, list) else keywords
             print(f"[INFO] Searching SerpAPI for: {query}")

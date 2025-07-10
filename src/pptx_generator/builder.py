@@ -8,6 +8,10 @@ from src.models.presentation import Presentation as PresentationModel
 
 # Delay image fetcher imports to runtime based on user input
 class PPTXBuilder:
+    """
+    Builds a PowerPoint presentation (.pptx) using a base template and AI-generated content.
+    Optionally includes images based on keywords and selected provider (e.g., Pexels or SerpAPI).
+    """
     def __init__(
         self,
         presentation: PresentationModel,

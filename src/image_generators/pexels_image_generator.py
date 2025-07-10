@@ -7,14 +7,31 @@ load_dotenv()
 PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
 
 class PexelsImageGenerator:
-    
+    """
+    A utility class that uses the Pexels API to fetch an image based on a keyword query
+    and saves it locally for use in presentations or other applications.
+    """
     def __init__(self, image_dir="images"):
+        """
+        Initializes the image generator and ensures the output directory exists.
+
+        Args:
+            image_dir (str): Directory where the downloaded images will be saved.
+        """
         self.image_dir = image_dir
         if not os.path.exists(self.image_dir):
             os.makedirs(self.image_dir)
 
     def fetch_image(self, keywords: str) -> str:
-        # Ensure keywords is a string
+        """
+        Searches the Pexels API for an image matching the given keywords and saves it locally.
+
+        Args:
+            keywords (str or list): Search query string or list of keyword strings.
+
+        Returns:
+            str: Path to the saved image file, or None if no image was found or an error occurred.
+        """
         if isinstance(keywords, list):
             keywords = " ".join(keywords)
             

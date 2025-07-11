@@ -6,18 +6,21 @@ SlideAI is a full-stack AI-powered slide generator. It includes a FastAPI backen
 
 ## Features:
 
--  REST API built with FastAPI
+- REST API built with FastAPI
 - Streamlit web frontend for file upload and download
--  LLM integration via OpenAI API (GPT-4o)
--  Reads raw `.txt` files as input context
--  Structured JSON output for slide content
--  Retry logic for resilient API calls using `tenacity`
--  Secure configuration with `.env`
+- LLM integration via OpenAI API (GPT-4o)
+- Reads raw `.txt` files as input context
+- Structured JSON output for slide content
+- Retry logic for resilient API calls using `tenacity`
+- Secure configuration with `.env`
 - Dynamic image generation with support for:
   - No images
   - Pexels API
   - SerpAPI (Google Images)
-- Images automatically added to slides using keywords
+- PowerPoint template support:
+  - Default and custom templates (e.g., company-branded)
+  - Preserves original layout, fonts, and styling
+
 
 ---
 

@@ -82,17 +82,17 @@ class PPTXBuilder:
             del xml_slides[1]  # Remove 2nd slide (index 1)
 
     def _insert_content_between_first_and_last(self):
-        layout = self.prs.slide_layouts[1]  # Assuming Title and Content
-        insert_index = 1  # Between title and thank you
+        layout = self.prs.slide_layouts[0]  # 'Basic Black Slide'
+        insert_index = 1  # After intro, before thank-you
 
         for slide_data in self.presentation_model.slides:
             new_slide = self.prs.slides.add_slide(layout)
             self._fill_slide(new_slide, slide_data)
 
-            # Insert newly created slide before thank you slide
             xml_slides = self.prs.slides._sldIdLst
             xml_slides.insert(insert_index, xml_slides[-1])
             insert_index += 1
+
 
     def _add_title_slide(self):
         layout = self.prs.slide_layouts[0]
@@ -150,6 +150,25 @@ class PPTXBuilder:
             image_path = self.image_fetcher.fetch_image(keywords)
             if image_path:
                 self._insert_image_with_border(slide, image_path)
+        
+                # Try to find and update a top-positioned, empty text box with the overall title
+        for shape in slide.shapes:
+            if shape.has_text_frame and not shape.text.strip():
+                # Heuristic: look for shapes in upper part of slide
+                if shape.top < Inches(1.5):  # adjust threshold if needed
+                    paragraph = shape.text_frame.paragraphs[0]
+                    paragraph.text = self.presentation_model.title
+                    paragraph.font.size = Pt(14)
+                    paragraph.font.bold = True
+                    font = paragraph.font
+                    font.size = Pt(14)
+                    font.bold = True
+                    font.color.rgb = RGBColor(255, 255, 0)  # Yellow
+                    break
+
+
+
+
 
     def _find_placeholders(self, slide):
         title_ph, content_ph = None, None
